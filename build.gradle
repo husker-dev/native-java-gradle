@@ -14,10 +14,13 @@ plugins {
     id 'com.gradle.plugin-publish' version '0.14.0'
 }
 
+/*
 def thisPlugin = new GroovyScriptEngine(file('src/main/groovy').absolutePath, this.class.classLoader)
                 .loadScriptByName('com/husker/gradle/ncompile/NativeCompilePlugin.groovy')
 
 apply plugin: thisPlugin
+
+ */
 apply plugin: 'de.undercouch.download'
 
 repositories {
@@ -25,6 +28,8 @@ repositories {
 }
 
 dependencies {
+    implementation gradleApi()
+    implementation localGroovy()
     testImplementation('org.spockframework:spock-core:1.3-groovy-2.5') {
         exclude group: 'org.codehaus.groovy'
     }
@@ -36,12 +41,12 @@ pluginBundle {
     tags = ['java', 'native', 'graal', 'graalvm', 'compile', 'compilation']
 }
 
-group 'com.husker'
+group 'com.husker.native'
 version = '1.0'
 
 gradlePlugin {
     plugins {
-        greetingsPlugin {
+        ncompile {
             id = 'com.husker.native'
             displayName = 'Java native compile'
             description = "Native Java compilation using GraalVM"
