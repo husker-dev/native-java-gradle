@@ -1,37 +1,25 @@
 package com.husker.gradle.ncompile.compile
 
-import com.husker.gradle.ncompile.compile.impl.UnsupportedPlatform
 import com.husker.gradle.ncompile.compile.impl.WindowsCompiler
 
 import static com.husker.gradle.ncompile.PluginConfig.*
-import java.util.function.Predicate
 
 abstract class PlatformCompiler {
 
-    static HashMap<Predicate<String>, PlatformCompiler> compilers = new HashMap<>()
+    static ArrayList<PlatformCompiler> compilers = new ArrayList<>()
 
     static {
-        // Windows
-        compilers.put({os -> os.contains("win")}, new WindowsCompiler())
-
-        // MacOS
-        compilers.put({os -> os.contains("mac")}, new UnsupportedPlatform())
-
-        // Linux
-        compilers.put({os ->
-            return os.contains("nix") || os.contains("nux") || os.contains("aix")
-        }, new UnsupportedPlatform())
+        compilers.add(new WindowsCompiler())
     }
 
     static PlatformCompiler getDefaultCompiler(){
-        String os = System.getProperty("os.name")
-        PlatformCompiler found = new UnsupportedPlatform()
+        for(PlatformCompiler compiler : compilers)
+            if(compiler.testCompatibility())
+                return compiler
+    }
 
-        compilers.keySet().forEach({a ->
-            if(a.test(os))
-                found = compilers.get(a)
-        })
-        return found
+    static String getOSName(){
+        return System.getProperty("os.name").toLowerCase()
     }
 
     String prefix
@@ -43,6 +31,8 @@ abstract class PlatformCompiler {
         return "$tmpFolder/$prefix"
     }
 
+    abstract String getRunnableExtension()
     abstract Process runScript(String script)
-    abstract void applySettings(File file);
+    abstract void applySettings(File file)
+    abstract boolean testCompatibility()
 }

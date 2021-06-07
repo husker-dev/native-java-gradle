@@ -4,6 +4,10 @@ import static com.husker.gradle.ncompile.PluginConfig.*
 
 class UPX extends Tool {
 
+    static {
+        addTool(this)
+    }
+
     static void run(String exe){
         project.exec {
             commandLine "$toolsPath/upx.exe", String.join(" ", extension.upxArgs.get()), exe
@@ -11,8 +15,8 @@ class UPX extends Tool {
         }
     }
 
-    boolean checkForExist() {
-        return existFile("upx.exe")
+    boolean needDownload() {
+        return !existFile("upx.exe")
     }
 
     void download() {

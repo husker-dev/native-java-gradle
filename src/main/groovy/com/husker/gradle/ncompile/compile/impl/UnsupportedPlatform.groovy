@@ -9,11 +9,19 @@ class UnsupportedPlatform extends PlatformCompiler{
         super("unsupported")
     }
 
+    String getRunnableExtension() {
+        return ""
+    }
+
     Process runScript(String script) {
         throw new GradleException("Unsupported OS (${System.getProperty("os.name")})")
     }
 
     void applySettings(File file) {
         throw new GradleException("Unsupported OS (${System.getProperty("os.name")})")
+    }
+
+    boolean testCompatibility() {
+        return true
     }
 }

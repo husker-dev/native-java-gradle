@@ -1,4 +1,4 @@
-package com.husker.gradle.ncompile.tasks
+package com.husker.gradle.ncompile.utils
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.Internal
@@ -10,7 +10,8 @@ abstract class ProgressTask extends DefaultTask{
     @Internal
     ProgressLogger progressLogger = getProgressLogger()
 
-    void startProgress(){
+    void startProgress(String description){
+        progressLogger.description = description
         progressLogger.started()
     }
 

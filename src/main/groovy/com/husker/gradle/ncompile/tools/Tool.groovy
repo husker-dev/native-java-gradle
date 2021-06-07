@@ -4,28 +4,22 @@ import static com.husker.gradle.ncompile.PluginConfig.*
 
 abstract class Tool {
 
-    static {
-        def tools = [
-                ResourceHacker, UPX
-        ]
-
-        for(def clazz : tools){
-            def instance = clazz.getDeclaredConstructor().newInstance()
-            if(instance.checkForExist())
-                instance.download()
-        }
-    }
-
-    public static String toolsFolderName = "native-tools"
+    public static String toolsFolderName = "tools"
 
     static String getToolsPath(){
-        return "$project.buildDir/$toolsFolderName"
+        return "$nativeFolder/$toolsFolderName"
     }
 
     protected static existFile(String name){
         return project.file("$toolsPath/$name").exists()
     }
 
-    abstract boolean checkForExist();
+    static void addTool(Class<Tool> clazz){
+        def instance = clazz.getDeclaredConstructor().newInstance()
+        if (instance.needDownload())
+            instance.download()
+    }
+
+    abstract boolean needDownload();
     abstract void download();
 }

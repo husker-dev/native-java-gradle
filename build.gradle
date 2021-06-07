@@ -35,22 +35,26 @@ dependencies {
     }
 }
 
+group 'com.husker.native'
+version = '1.1'
+
+gradlePlugin {
+    plugins {
+        nativeCompile {
+            id = 'com.husker.native'
+            implementationClass = 'com.husker.gradle.ncompile.NativeCompilePlugin'
+        }
+    }
+}
+
 pluginBundle {
     website = 'https://github.com/husker-dev/native-java-gradle'
     vcsUrl = 'https://github.com/husker-dev/native-java-gradle'
     tags = ['java', 'native', 'graal', 'graalvm', 'compile', 'compilation']
-}
-
-group 'com.husker.native'
-version = '1.0'
-
-gradlePlugin {
+    description = "Native Java compilation using GraalVM"
     plugins {
-        ncompile {
-            id = 'com.husker.native'
+        nativeCompile {
             displayName = 'Java native compile'
-            description = "Native Java compilation using GraalVM"
-            implementationClass = 'com.husker.gradle.ncompile.NativeCompilePlugin'
         }
     }
 }

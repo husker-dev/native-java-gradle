@@ -2,6 +2,8 @@ package com.husker.gradle.ncompile.compile.impl
 
 import com.husker.gradle.ncompile.compile.PlatformCompiler
 import com.husker.gradle.ncompile.tools.ResourceHacker
+import com.husker.gradle.ncompile.tools.VSWhere
+import org.gradle.api.GradleException
 
 import static com.husker.gradle.ncompile.PluginConfig.*
 
@@ -11,13 +13,28 @@ class WindowsCompiler extends PlatformCompiler {
         super("win")
     }
 
+    String getRunnableExtension() {
+        return "exe"
+    }
+
     Process runScript(String script) {
+        return runVCScript("build", script)
+    }
+
+    Process runVCScript(String fileName, String script){
+        String vs = extension.visualStudio.get()
+        if(vs == "#default"){
+            vs = VSWhere.getVSPath()
+            if(vs == null)
+                throw new GradleException("Can't find installed Visual Studio. Please specify property 'visualStudio' by yourself")
+        }
+
         String command = [
                 "@echo off",
-                "call \"${extension.vcVars.get()}\"",
+                "call \"$vs\\VC\\Auxiliary\\Build\\vcvars64.bat\"",
                 "call $script"
         ].join("\n")
-        File file = project.file("$dir/build.bat")
+        File file = project.file("$dir/${fileName}.bat")
         file.text = command
 
         return Runtime.getRuntime().exec("\"${file.getPath()}\"")
@@ -68,8 +85,8 @@ BLOCK "VarFileInfo"
                     ['-action addskip', "-res \"${extension.icon.get()}\"", '-mask ICONGROUP,MAINICON,']
             )
         }
-        if(extension.console.get())
-            runScript("editbin /SUBSYSTEM:WINDOWS \"${file.getPath()}\"")
+        if(!extension.console.get())
+            runVCScript("windows", "editbin /SUBSYSTEM:WINDOWS \"${file.getPath()}\"")
 
         project.delete{
             delete("$dir/resources.rc")
@@ -79,5 +96,7 @@ BLOCK "VarFileInfo"
         }
     }
 
-
+    boolean testCompatibility() {
+        return OSName.contains("win")
+    }
 }

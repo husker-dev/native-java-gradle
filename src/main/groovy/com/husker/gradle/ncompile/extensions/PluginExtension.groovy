@@ -1,21 +1,20 @@
-package com.husker.gradle.ncompile;
+package com.husker.gradle.ncompile.extensions;
 
 import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 
-abstract class NativeCompilePluginExtension {
+abstract class PluginExtension {
     abstract Property<Boolean> getConsole()
-    abstract Property<String> getGraalVM()
-    abstract Property<String> getVcVars()
+    abstract Property<String> getVisualStudio()
     abstract Property<String> getOutputName()
     abstract Property<String> getJarPath()
     abstract ListProperty<String> getUpxArgs()
-    abstract ListProperty<String> getGraalArgs()
     abstract Property<Boolean> getCompress()
 
     // Download links
     abstract Property<String> getUpxDownloadLink()
     abstract Property<String> getResourceHackerDownloadLink()
+    abstract Property<String> getVSWhereDownloadLink()
 
     // Exe info
     abstract Property<String> getIcon()
@@ -26,18 +25,19 @@ abstract class NativeCompilePluginExtension {
     abstract Property<String> getCopyright()
     abstract Property<String> getProductName()
 
-    NativeCompilePluginExtension(){
-        vcVars.convention('#undefined')
+    PluginExtension(){
+        visualStudio.convention('#default')
         jarPath.convention('#default')
-        graalArgs.convention([])
 
         upxDownloadLink.convention('https://github.com/upx/upx/releases/download/v3.96/upx-3.96-win64.zip')
         upxArgs.convention(['-9'])
         compress.convention(true)
 
+        VSWhereDownloadLink.convention('https://github.com/microsoft/vswhere/releases/download/2.8.4/vswhere.exe')
+
         resourceHackerDownloadLink.convention('http://www.angusj.com/resourcehacker/resource_hacker.zip')
         console.convention(true)
-        outputName.convention("application")
+        outputName.convention("#default")
 
         icon.convention("#undefined")
         fileDescription.convention("Unknown description")

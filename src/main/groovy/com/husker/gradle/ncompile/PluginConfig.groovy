@@ -1,10 +1,13 @@
 package com.husker.gradle.ncompile
 
+import com.husker.gradle.ncompile.extensions.*
 import org.gradle.api.Project
 
 class PluginConfig {
 
-    public static NativeCompilePluginExtension extension
+    public static PluginExtension extension
+    public static GraalVMExtension graalExtension
     public static Project project
     public static String tmpFolder
+    public static String nativeFolder
 }
