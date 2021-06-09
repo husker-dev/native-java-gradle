@@ -40,9 +40,10 @@ version = '1.1'
 
 gradlePlugin {
     plugins {
-        nativeCompile {
+        nativeCompilePlugin {
             id = 'com.husker.native'
             implementationClass = 'com.husker.gradle.ncompile.NativeCompilePlugin'
+            displayName = 'Java native compile'
         }
     }
 }
@@ -52,10 +53,5 @@ pluginBundle {
     vcsUrl = 'https://github.com/husker-dev/native-java-gradle'
     tags = ['java', 'native', 'graal', 'graalvm', 'compile', 'compilation']
     description = "Native Java compilation using GraalVM"
-    plugins {
-        nativeCompile {
-            displayName = 'Java native compile'
-        }
-    }
 }
 

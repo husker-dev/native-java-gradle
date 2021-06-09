@@ -1,7 +1,7 @@
-package com.husker.gradle.ncompile.extensions;
+package com.husker.gradle.ncompile.extensions
 
-import org.gradle.api.provider.ListProperty;
-import org.gradle.api.provider.Property;
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 
 abstract class PluginExtension {
 

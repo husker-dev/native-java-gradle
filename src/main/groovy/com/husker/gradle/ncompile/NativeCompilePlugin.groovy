@@ -19,10 +19,10 @@ class NativeCompilePlugin implements Plugin<Project> {
         project.getPluginManager().apply("de.undercouch.download")
 
         PluginConfig.project = project
-        extension = project.extensions.create('nativeCompile', PluginExtension.class)
-        graalExtension = project.extensions.nativeCompile.extensions.create("graalvm", GraalVMExtension.class)
-        downloadsExtension = project.extensions.nativeCompile.extensions.create("downloads", DownloadsExtension.class)
-        infoExtension = project.extensions.nativeCompile.extensions.create("output", InfoExtension.class)
+        extension = project.extensions.add('nativeCompile', PluginExtension.class)
+        graalExtension = project.extensions.nativeCompile.extensions.add("graalvm", GraalVMExtension.class)
+        downloadsExtension = project.extensions.nativeCompile.extensions.add("downloads", DownloadsExtension.class)
+        infoExtension = project.extensions.nativeCompile.extensions.add("output", InfoExtension.class)
 
         tmpFolder = "$project.buildDir/tmp/native"
         nativeFolder = "$project.projectDir/native"
@@ -30,8 +30,6 @@ class NativeCompilePlugin implements Plugin<Project> {
         project.task('createConfig', type: CreateGraalConfig)
         project.task('compile', type: CreateBinary)
         project.task("prepareNative", type: PrepareNative)
-
-        System.setProperty("gate.home", "/some/directory");
     }
 
 }
