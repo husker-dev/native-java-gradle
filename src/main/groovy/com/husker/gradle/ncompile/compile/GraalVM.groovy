@@ -2,6 +2,8 @@ package com.husker.gradle.ncompile.compile
 
 import com.husker.gradle.ncompile.utils.Platform
 
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.function.Consumer
 
 import static com.husker.gradle.ncompile.PluginConfig.*
@@ -12,6 +14,11 @@ class GraalVM {
 
     static {
         try {
+            if(System.getenv().containsKey("GRAAL_HOME")){
+                if(Files.exists(Paths.get(System.getenv("GRAAL_HOME"))))
+                    graalExtension.path.set(System.getenv("GRAAL_HOME"))
+            }
+
             if (graalExtension.path.get() == "#default") {
                 String osPrefix = "linux"
                 String archiveExt = "tar.gz"
@@ -53,6 +60,9 @@ class GraalVM {
                 commandLine 'cmd', '/c', "\"${graalExtension.path.get()}\\bin\\gu$cmdExtension\" install native-image"
                 standardOutput = new ByteArrayOutputStream()
             }
+            if(Platform.windows)
+                Runtime.runtime.exec("setx GRAAL_HOME \"${graalExtension.path.get()}\"")
+
         }catch(Exception e){
             e.printStackTrace()
         }
@@ -74,7 +84,7 @@ class GraalVM {
                 '-H:JNIConfigurationResources=${.}/jni-config.json',
                 '-H:ResourceConfigurationResources=${.}/resource-config.json'
         ]
-        graalArgs.addAll(graalExtension.graalArgs.get())
+        graalArgs.addAll(graalExtension.args.get())
         project.file("$configPath/META-INF/native-image/native-image.properties")
                 .text = "Args = ${String.join(" \\\n       ", graalArgs)}"
     }
@@ -82,7 +92,7 @@ class GraalVM {
     static File createImage(File jar, Consumer<Integer> progress){
         progress.accept(0)
         PlatformCompiler compiler = PlatformCompiler.getDefaultCompiler()
-        File outputFile = project.file("${compiler.dir}/${extension.outputName.get()}.${compiler.runnableExtension}")
+        File outputFile = project.file("${compiler.dir}/${infoExtension.outputName.get()}.${compiler.runnableExtension}")
         project.mkdir compiler.dir
 
         Process process = compiler.runScript([
@@ -90,7 +100,8 @@ class GraalVM {
                 "-jar",
                 "\"${jar.getPath()}\"",
                 "\"${outputFile.getPath().replace(".${compiler.runnableExtension}", "")}\"",
-                "--no-fallback"
+                "--no-fallback",
+                graalExtension.args.get().join(" ")
         ].join(" "))
 
         // Error output
@@ -104,6 +115,7 @@ class GraalVM {
         BufferedReader reader = new BufferedReader(new InputStreamReader(process.inputStream))
         String line
         while ((line = reader.readLine()) != null) {
+            println line
             def keys = [
                     'Environment initialized for:',
                     'classlist:',

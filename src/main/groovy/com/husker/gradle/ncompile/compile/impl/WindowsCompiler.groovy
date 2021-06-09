@@ -43,21 +43,21 @@ class WindowsCompiler extends PlatformCompiler {
     void applySettings(File file) {
         project.file("$dir/resources.rc").text = """
 VS_VERSION_INFO VERSIONINFO
-FILEVERSION ${extension.fileVersion.get().replace('.', ',')}
-PRODUCTVERSION ${extension.productVersion.get().replace('.', ',')}
+FILEVERSION ${infoExtension.fileVersion.get().replace('.', ',')}
+PRODUCTVERSION ${infoExtension.productVersion.get().replace('.', ',')}
 {
 BLOCK "StringFileInfo"
 {
     BLOCK "040904E4"
     {
-        VALUE "CompanyName", "${extension.companyName.get()}\\0"
-        VALUE "FileDescription", "${extension.fileDescription.get()}\\0"
-        VALUE "FileVersion", "${extension.fileVersion.get()}\\0"
-        VALUE "ProductName", "${extension.productName.get()}\\0"
-        VALUE "InternalName", "${extension.productName.get()}\\0"
-        VALUE "LegalCopyright", "${extension.copyright.get()}\\0"
-        VALUE "OriginalFilename", "${extension.outputName.get()}.exe\\0"
-        VALUE "ProductVersion", "${extension.productVersion.get()}\\0"
+        VALUE "CompanyName", "${infoExtension.companyName.get()}\\0"
+        VALUE "FileDescription", "${infoExtension.fileDescription.get()}\\0"
+        VALUE "FileVersion", "${infoExtension.fileVersion.get()}\\0"
+        VALUE "ProductName", "${infoExtension.productName.get()}\\0"
+        VALUE "InternalName", "${infoExtension.productName.get()}\\0"
+        VALUE "LegalCopyright", "${infoExtension.copyright.get()}\\0"
+        VALUE "OriginalFilename", "${infoExtension.outputName.get()}.exe\\0"
+        VALUE "ProductVersion", "${infoExtension.productVersion.get()}\\0"
     }
 }
 
@@ -78,15 +78,15 @@ BLOCK "VarFileInfo"
                 file.getPath(),
                 ['-action addoverwrite', "-resource \"$dir/resources.res\""]
         )
-        if (extension.icon.get() != "#undefined") {
+        if (infoExtension.icon.get() != "#undefined") {
             // Setting icon
             ResourceHacker.runExe(
                     file.getPath(),
-                    ['-action addskip', "-res \"${extension.icon.get()}\"", '-mask ICONGROUP,MAINICON,']
+                    ['-action addskip', "-res \"${infoExtension.icon.get()}\"", '-mask ICONGROUP,MAINICON,']
             )
         }
-        if(!extension.console.get())
-            runVCScript("windows", "editbin /SUBSYSTEM:WINDOWS \"${file.getPath()}\"")
+        if(!infoExtension.console.get())
+            runVCScript("windows", "editbin /SUBSYSTEM:WINDOWS \"${file.getPath()}\"").waitFor()
 
         project.delete{
             delete("$dir/resources.rc")

@@ -27,7 +27,9 @@ class ResourceHacker extends Tool {
                 commandLine 'cmd', '/c', "call \"$toolsPath/ResourceHacker.exe\" ${String.join(" ", args)}"
             }
         }catch(Exception ignored){}
-        while (!project.file(saveFile).exists()){
+
+        long startTime = System.currentTimeMillis();
+        while (!project.file(saveFile).exists() && System.currentTimeMillis() - startTime < 5000){
             Thread.sleep(5)
         }
     }
@@ -38,7 +40,7 @@ class ResourceHacker extends Tool {
 
     void download() {
         project.download {
-            src extension.resourceHackerDownloadLink.get()
+            src downloadsExtension.resourceHackerDownloadLink.get()
             dest project.file("$toolsPath/resourceHacker.zip")
         }
         project.copy {

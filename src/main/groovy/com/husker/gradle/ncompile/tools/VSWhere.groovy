@@ -14,7 +14,7 @@ class VSWhere extends Tool {
 
     void download() {
         project.download {
-            src extension.VSWhereDownloadLink.get()
+            src downloadsExtension.VSWhereDownloadLink.get()
             dest project.file("$toolsPath/vswhere.exe")
         }
     }

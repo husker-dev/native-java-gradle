@@ -29,8 +29,8 @@ class PrepareNative extends DefaultTask {
         if (extension.jarPath.get() == "#default")
             extension.jarPath.set(project.jar.archiveFile.get().asFile.toPath().toString())
 
-        if (extension.outputName.get() == "#default")
-            extension.outputName.set(new File(extension.jarPath.get()).getName().replace(".jar", ""))
+        if (infoExtension.outputName.get() == "#default")
+            infoExtension.outputName.set(new File(extension.jarPath.get()).getName().replace(".jar", ""))
 
         File configFile = project.file("$GraalVM.configPath/META-INF/native-image")
         if(!configFile.exists() || configFile.length() == 0)

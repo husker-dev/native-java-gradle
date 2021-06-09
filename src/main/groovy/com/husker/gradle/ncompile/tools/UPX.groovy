@@ -9,6 +9,7 @@ class UPX extends Tool {
     }
 
     static void run(String exe){
+        println "Compressing..."
         project.exec {
             commandLine "$toolsPath/upx.exe", String.join(" ", extension.upxArgs.get()), exe
             standardOutput = new ByteArrayOutputStream()    // Mute output
@@ -21,7 +22,7 @@ class UPX extends Tool {
 
     void download() {
         project.download {
-            src extension.upxDownloadLink.get()
+            src downloadsExtension.upxDownloadLink.get()
             dest project.file("$toolsPath/upx.zip")
         }
         project.copy {
