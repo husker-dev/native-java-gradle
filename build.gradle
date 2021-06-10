@@ -33,10 +33,20 @@ dependencies {
 group 'com.husker.native'
 version = '1.1'
 
+
 jar {
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    from configurations.runtimeClasspath.findAll {it =~ "gradle-download-task"}.collect {
+        zipTree(it)
     }
+}
+
+task testTask {
+    doFirst{
+        println configurations.runtimeClasspath.findAll().collect({
+            println it
+        })
+    }
+
 }
 
 gradlePlugin {
