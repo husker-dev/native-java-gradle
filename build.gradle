@@ -40,15 +40,6 @@ jar {
     }
 }
 
-task testTask {
-    doFirst{
-        println configurations.runtimeClasspath.findAll().collect({
-            println it
-        })
-    }
-
-}
-
 gradlePlugin {
     plugins {
         nativeCompilePlugin {
