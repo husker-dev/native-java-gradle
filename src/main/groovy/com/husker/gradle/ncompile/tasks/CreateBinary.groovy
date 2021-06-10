@@ -35,6 +35,7 @@ class CreateBinary extends ProgressTask {
             from compiled.getPath()
             into "$project.buildDir/native"
         }
+        println "Compiled file: \"$project.buildDir\\native\\${compiled.name}\""
     }
 
     private void addToZip(String zipFile, String newZip, File file) {
