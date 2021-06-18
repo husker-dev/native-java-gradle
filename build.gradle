@@ -28,23 +28,27 @@ dependencies {
         exclude group: 'org.codehaus.groovy'
     }
     implementation 'de.undercouch:gradle-download-task:4.1.1'
+    implementation 'net.java.dev.jna:jna:5.8.0'
+    implementation 'net.java.dev.jna:jna-platform:5.8.0'
+    implementation 'org.json:json:+'
+
 }
 
-group 'com.husker.native'
+group 'ru.mail.husker-dev'
 version = '1.1'
 
-
 jar {
-    from configurations.runtimeClasspath.findAll {it =~ "gradle-download-task"}.collect {
-        zipTree(it)
-    }
+    from configurations.runtimeClasspath.findAll {
+        it =~ "gradle-download-task" ||
+        it =~ "json"
+    }.collect {zipTree(it)}
 }
 
 gradlePlugin {
     plugins {
         nativeCompilePlugin {
-            id = 'com.husker.native'
-            implementationClass = 'com.husker.gradle.ncompile.NativeCompilePlugin'
+            id = 'ru.mail.husker-dev.native'
+            implementationClass = 'ru.mail.huskerdev.gradle.ncompile.NativeCompilePlugin'
             displayName = 'Java native compile'
         }
     }
