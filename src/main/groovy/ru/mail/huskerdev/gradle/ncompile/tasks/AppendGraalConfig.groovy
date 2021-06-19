@@ -11,7 +11,7 @@ class AppendGraalConfig extends DefaultTask {
     AppendGraalConfig(){
         description = 'Creates compile configuration which include: JNI, Reflection, Serialization, Proxy, Resources, Graal arguments'
         dependsOn('prepareNative')
-        group = "native"
+        group = "native-config"
     }
 
     @TaskAction

@@ -11,11 +11,14 @@ abstract class PluginExtension {
     abstract ListProperty<String> getUpxArgs()
     abstract Property<Boolean> getCompress()
 
+    abstract ListProperty<String> getReflectionOpens()
+
     PluginExtension(){
         visualStudio.convention('#default')
         jarPath.convention('#default')
 
         upxArgs.convention(['-9'])
         compress.convention(true)
+        reflectionOpens.convention([])
     }
 }

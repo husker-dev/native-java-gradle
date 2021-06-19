@@ -68,11 +68,15 @@ class WindowsCompiler extends PlatformCompiler {
     }
 
     void setSystemVariable(String name, String value) {
-        runCommand("setx ${name} \"${value}\"")
+        runCommand("setx ${name} \"${value}\"").waitFor()
     }
 
     Process runCommand(String command) {
         return Runtime.runtime.exec(command)
+    }
+
+    String getCmdExtension() {
+        return "cmd"
     }
 
     Process runVCCommand(String fileName, String script){

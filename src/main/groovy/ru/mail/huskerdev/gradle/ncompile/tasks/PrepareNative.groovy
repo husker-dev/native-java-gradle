@@ -17,15 +17,12 @@ class PrepareNative extends DefaultTask {
 
     @TaskAction
     void run(){
-        project.delete {
-            delete "$project.buildDir/tmp/native"
-        }
+        project.delete("$project.buildDir/tmp/native")
 
-        project.mkdir "$project.buildDir/native"
         project.mkdir Tool.toolsPath
         project.mkdir GraalVM.configPath
         project.mkdir nativeFolder
-        project.mkdir "$project.buildDir/tmp/native"
+        project.mkdir tmpFolder
 
         if (extension.jarPath.get() == "#default")
             extension.jarPath.set(project.jar.archiveFile.get().asFile.toPath().toString())
@@ -34,7 +31,7 @@ class PrepareNative extends DefaultTask {
             infoExtension.outputName.set(new File(extension.jarPath.get()).getName().replace(".jar", ""))
 
         GraalVM.checkForGraalVM()
-        File configFile = project.file("$GraalVM.configPath/META-INF/native-image")
+        File configFile = project.file(GraalVM.configPath)
         if(!configFile.exists() || configFile.length() == 0)
             GraalVM.createConfig(null)
     }

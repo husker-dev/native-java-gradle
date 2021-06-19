@@ -38,6 +38,7 @@ abstract class PlatformCompiler {
     abstract boolean isCompatible()
     abstract void setSystemVariable(String name, String value)
     abstract Process runCommand(String command)
+    abstract String getCmdExtension()
 
     String readContextFile(String path){
         return new BufferedReader(new InputStreamReader(PlatformCompiler.class.getResourceAsStream("/$prefix/$path")))
@@ -77,6 +78,10 @@ abstract class PlatformCompiler {
         }
 
         Process runCommand(String command) {
+            throwUnsupported()
+        }
+
+        String getCmdExtension() {
             throwUnsupported()
         }
     }

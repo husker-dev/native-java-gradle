@@ -16,20 +16,23 @@ class GraalVM {
     private static String path = ""
 
     static final String systemVariable = "GRAALVM_HOME"
-    static final String configFolderName = "config"
+    static final String configFolderName = "native-config"
+    static final String tmpConfigFolderName = "configuration"
+
+    static final ArrayList<Runnable> onNativeImageListeners = new ArrayList<>()
 
     static void createConfig(String filePath, boolean append = false){
         String argument = filePath == null ? "--version" : "${getLaunchSettings(project.file(filePath))} ${graalExtension.configArgs.get().join(" ")}"
         String agentSetting = append ? "config-merge-dir" : "config-output-dir"
 
         PlatformCompiler compiler = PlatformCompiler.getDefaultCompiler()
-        Process process = compiler.runCommand("\"$path\\bin\\java\" -agentlib:native-image-agent=$agentSetting=\"$configPath\\META-INF\\native-image\" $argument")
+        Process process = compiler.runCommand("\"$path\\bin\\java\" -agentlib:native-image-agent=$agentSetting=\"$configPath\" $argument")
         StreamUtils.readStream({println it}, process.errorStream, process.inputStream)
         process.waitFor()
 
         if(filePath != null && graalExtension.allResources.get()){
             HashSet<String> resources = new HashSet<>()
-            File resourcesFile = new File("$configPath\\META-INF\\native-image\\resource-config.json")
+            File resourcesFile = new File("$configPath\\resource-config.json")
 
             JSONObject fileJson = new JSONObject(resourcesFile.text)
             JSONArray includesArray = fileJson.getJSONObject("resources").getJSONArray("includes")
@@ -58,32 +61,62 @@ class GraalVM {
             resourcesFile.text = fileJson.toString(2)
         }
 
-        def graalArgs = [
-                '-H:+ReportUnsupportedElementsAtRuntime',
-                '-H:+ReportExceptionStackTraces',
-                '-H:ReflectionConfigurationResources=${.}/reflect-config.json',
-                '-H:DynamicProxyConfigurationResources=${.}/proxy-config.json',
-                '-H:JNIConfigurationResources=${.}/jni-config.json',
-                '-H:ResourceConfigurationResources=${.}/resource-config.json',
-        ]
-        project.file("$configPath/META-INF/native-image/native-image.properties")
-                .text = "Args = ${String.join(" \\\n       ", graalArgs)}"
+
     }
 
     static File createImage(File jar, Consumer<Integer> progress){
         progress.accept(0)
 
+        // Initialize compiler and folders
         PlatformCompiler compiler = PlatformCompiler.getDefaultCompiler()
         File outputFile = project.file(compiler.dir + "/" + infoExtension.outputName.get())
         project.mkdir compiler.dir
+        project.mkdir tmpConfigPath
 
+        /*
+            Initialize config files by merging in temporary folder
+         */
+        def propertiesArgs = [
+                '-H:ReflectionConfigurationResources=${.}/reflect-config.json',
+                '-H:DynamicProxyConfigurationResources=${.}/proxy-config.json',
+                '-H:JNIConfigurationResources=${.}/jni-config.json',
+                '-H:ResourceConfigurationResources=${.}/resource-config.json',
+        ]
+        project.file("$tmpConfigPath/native-image.properties").text = "Args = ${propertiesArgs.join(" \\\n       ")}"
+        Files.copy(Paths.get("$configPath/reflect-config.json"), Paths.get("$tmpConfigPath/reflect-config.json"))
+        Files.copy(Paths.get("$configPath/proxy-config.json"), Paths.get("$tmpConfigPath/proxy-config.json"))
+        Files.copy(Paths.get("$configPath/jni-config.json"), Paths.get("$tmpConfigPath/jni-config.json"))
+        Files.copy(Paths.get("$configPath/resource-config.json"), Paths.get("$tmpConfigPath/resource-config.json"))
+
+        // Append reflection cases
+        File reflectionsFile = project.file("$tmpConfigPath/reflect-config.json")
+        JSONArray reflections = new JSONArray(reflectionsFile.text)
+        extension.reflectionOpens.get().each {
+            reflections.put(new JSONObject().put("name", it)
+            /*
+                    .put("allDeclaredConstructors", true)
+                    .put("allPublicConstructors", true)
+                    .put("allDeclaredFields", true)
+                    .put("allPublicFields", true)
+                    .put("allDeclaredMethods", true)
+                    .put("allPublicMethods", true)
+             */
+            )
+        }
+        reflectionsFile.text = reflections.toString(2)
+
+        onNativeImageListeners.forEach({it.run()})
+
+        // Start compilation
         Process process = compiler.runScript([
                 "$path\\bin\\native-image",
                 getLaunchSettings(jar),
                 "\"${outputFile.getPath()}\"",
                 "--no-fallback",
                 "--allow-incomplete-classpath",
-                "-H:ConfigurationFileDirectories=\"$configPath/META-INF/native-image\"",
+                "-H:+ReportExceptionStackTraces",
+                "-H:+ReportUnsupportedElementsAtRuntime",
+                "-H:ConfigurationFileDirectories=\"$tmpConfigPath\"",
                 graalExtension.args.get().join(" ")
         ].join(" "))
 
@@ -128,7 +161,11 @@ class GraalVM {
     }
 
     static String getConfigPath(){
-        return "$nativeFolder/$configFolderName"
+        return "$project.projectDir/$configFolderName"
+    }
+
+    static String getTmpConfigPath(){
+        return "$tmpFolder/$tmpConfigFolderName"
     }
 
     static String getPath(){
@@ -184,9 +221,13 @@ class GraalVM {
 
             PlatformCompiler compiler = PlatformCompiler.defaultCompiler
             compiler.setSystemVariable(systemVariable, path)
-            compiler.runCommand("\"$path\\bin\\gu.cmd\" install native-image").waitFor()
+            compiler.runCommand("\"$path\\bin\\gu.${compiler.getCmdExtension()}\" install native-image").waitFor()
         }catch(Exception e){
             e.printStackTrace()
         }
+    }
+
+    static void addOnNativeBuildListener(Runnable runnable){
+        onNativeImageListeners.add(runnable)
     }
 }
