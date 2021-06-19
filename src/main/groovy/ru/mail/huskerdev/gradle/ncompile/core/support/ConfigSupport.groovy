@@ -40,11 +40,11 @@ abstract class ConfigSupport implements Runnable{
         project.file("$GraalVM.tmpConfigPath/reflect-config.json")
     }
 
-    protected JSONArray getReflectionConfig(){
+    protected static JSONArray getReflectionConfig(){
         return new JSONArray(getReflectionConfigFile().text)
     }
 
-    protected void setReflectionConfig(JSONArray config){
+    protected static void setReflectionConfig(JSONArray config){
         getReflectionConfigFile().text = config.toString(2)
     }
 

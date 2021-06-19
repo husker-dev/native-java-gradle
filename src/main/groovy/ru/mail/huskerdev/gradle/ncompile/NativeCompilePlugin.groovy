@@ -4,7 +4,8 @@ package ru.mail.huskerdev.gradle.ncompile
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import ru.mail.huskerdev.gradle.ncompile.core.support.ConfigSupport
-import ru.mail.huskerdev.gradle.ncompile.core.support.javafx.JavaFXSupport
+import ru.mail.huskerdev.gradle.ncompile.core.support.impl.JavaFXSupport
+import ru.mail.huskerdev.gradle.ncompile.core.support.impl.ReflectionOpens
 import ru.mail.huskerdev.gradle.ncompile.extensions.DownloadsExtension
 import ru.mail.huskerdev.gradle.ncompile.extensions.GraalVMExtension
 import ru.mail.huskerdev.gradle.ncompile.extensions.InfoExtension
@@ -31,6 +32,7 @@ class NativeCompilePlugin implements Plugin<Project> {
         tmpFolder = "$project.buildDir/tmp/native"
         nativeFolder = "$project.projectDir/native"
 
+        ConfigSupport.add(new ReflectionOpens())
         ConfigSupport.add(new JavaFXSupport())
 
         project.task('createConfig', type: CreateGraalConfig)

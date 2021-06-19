@@ -88,23 +88,6 @@ class GraalVM {
         Files.copy(Paths.get("$configPath/jni-config.json"), Paths.get("$tmpConfigPath/jni-config.json"))
         Files.copy(Paths.get("$configPath/resource-config.json"), Paths.get("$tmpConfigPath/resource-config.json"))
 
-        // Append reflection cases
-        File reflectionsFile = project.file("$tmpConfigPath/reflect-config.json")
-        JSONArray reflections = new JSONArray(reflectionsFile.text)
-        extension.reflectionOpens.get().each {
-            reflections.put(new JSONObject().put("name", it)
-            /*
-                    .put("allDeclaredConstructors", true)
-                    .put("allPublicConstructors", true)
-                    .put("allDeclaredFields", true)
-                    .put("allPublicFields", true)
-                    .put("allDeclaredMethods", true)
-                    .put("allPublicMethods", true)
-             */
-            )
-        }
-        reflectionsFile.text = reflections.toString(2)
-
         onNativeImageListeners.forEach({it.run()})
 
         // Start compilation

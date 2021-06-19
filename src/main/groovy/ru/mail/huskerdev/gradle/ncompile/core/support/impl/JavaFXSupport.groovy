@@ -1,4 +1,4 @@
-package ru.mail.huskerdev.gradle.ncompile.core.support.javafx
+package ru.mail.huskerdev.gradle.ncompile.core.support.impl
 
 import org.json.JSONArray
 import org.json.JSONObject
