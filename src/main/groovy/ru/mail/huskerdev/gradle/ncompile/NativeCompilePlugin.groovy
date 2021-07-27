@@ -30,7 +30,6 @@ class NativeCompilePlugin implements Plugin<Project> {
         infoExtension = project.extensions.nativeCompile.extensions.create("output", InfoExtension.class)
 
         tmpFolder = "$project.buildDir/tmp/native"
-        nativeFolder = "$project.projectDir/native"
 
         ConfigSupport.add(new ReflectionOpens())
         ConfigSupport.add(new JavaFXSupport())

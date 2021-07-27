@@ -8,14 +8,6 @@ plugins {
     id "de.undercouch.download" version "4.1.1"
 }
 
-/*
-def thisPlugin = new GroovyScriptEngine(file('src/main/groovy').absolutePath, this.class.classLoader)
-                .loadScriptByName('com/husker/gradle/ncompile/NativeCompilePlugin.groovy')
-
-apply plugin: thisPlugin
-
- */
-
 
 repositories {
     mavenCentral()

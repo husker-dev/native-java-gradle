@@ -21,7 +21,6 @@ class PrepareNative extends DefaultTask {
 
         project.mkdir Tool.toolsPath
         project.mkdir GraalVM.configPath
-        project.mkdir nativeFolder
         project.mkdir tmpFolder
 
         if (extension.jarPath.get() == "#default")
